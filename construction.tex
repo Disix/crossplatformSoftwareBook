@@ -1,0 +1,468 @@
+\section{Конструювання ПЗ}
+Дисципліна ``Конструювання ПЗ'' описує аспексти створення і юніт-тестування діючого і корисного ПЗ, а тому є невідємним етапом в життєвому циклі розробки ПЗ за будь-якою моделлю.
+
+Проектування ПЗ можна в той чи в інший спосіб обійти, провівши його подумки, однак обійти процес написання коду і отримати при цьому діюче ПЗ --- неможливо. Саме процесом підготовки, удосконалення і тестування коду і займається дисципліна ``Конструювання ПЗ'' [Стівен Макконнелл. Конструювання ПЗ].
+\subsection{Конвенції кодування на мові Java}
+public class має бути першим у сирцевому файлі.
+
+Сирцевий файл складається в такому порядку:
+Початкові коментарі, пакетний та імпортуючі оператори, оголошення класів та інтерфейсів.
+
+Початковий коментар:
+\begin{lstlisting}
+/*
+ * Classname
+ * 
+ * Version information
+ *
+ * Date
+ * 
+ * Copyright notice
+ */
+\end{lstlisting}
+ 
+ На початку класу йдуть статичні, потім звичайні поля у порядку спадання видимості: First the public variables, then the protected, then package level (no access modifier), and then the private.
+ 
+ Потім йдуть конструктори, а тоді методи.These methods should be grouped by functionality rather than by scope or accessibility. For example, a private class method can be in between two public instance methods. The goal is to make reading and understanding the code easier.
+ 
+ Four spaces should be used as the unit of indentation.
+ 
+ Avoid lines longer than 80 characters.
+ 
+Here are some examples of breaking method calls (indent 8 spaces):
+
+someMethod(longExpression1, longExpression2, longExpression3, 
+        longExpression4, longExpression5);
+ 
+var = someMethod1(longExpression1,
+                someMethod2(longExpression2,
+                        longExpression3)); 
+ 
+ Дужки краще тримати в тій самій лінії:
+\begin{lstlisting}
+longName1 = longName2 * (longName3 + longName4 - longName5)
+           + 4 * longname6; // PREFER
+
+longName1 = longName2 * (longName3 + longName4
+                       - longName5) + 4 * longname6; // AVOID 
+					   
+//CONVENTIONAL INDENTATION
+someMethod(int anArg, Object anotherArg, String yetAnotherArg,
+           Object andStillAnother) {
+    ...
+}
+
+//INDENT 8 SPACES TO AVOID VERY DEEP INDENTS
+private static synchronized horkingLongMethodName(int anArg,
+        Object anotherArg, String yetAnotherArg,
+        Object andStillAnother) {
+    ...
+}
+
+//DON'T USE THIS INDENTATION
+if ((condition1 && condition2)
+    || (condition3 && condition4)
+    ||!(condition5 && condition6)) { //BAD WRAPS
+    doSomethingAboutIt();            //MAKE THIS LINE EASY TO MISS
+} 
+
+//USE THIS INDENTATION INSTEAD
+if ((condition1 && condition2)
+        || (condition3 && condition4)
+        ||!(condition5 && condition6)) {
+    doSomethingAboutIt();
+} 
+
+//OR USE THIS
+if ((condition1 && condition2) || (condition3 && condition4)
+        ||!(condition5 && condition6)) {
+    doSomethingAboutIt();
+} 
+Here are three acceptable ways to format ternary expressions:
+
+alpha = (aLongBooleanExpression) ? beta : gamma;  
+
+alpha = (aLongBooleanExpression) ? beta
+                                 : gamma;  
+
+alpha = (aLongBooleanExpression)
+        ? beta 
+        : gamma;  					   
+		
+		
+Comments should not be enclosed in large boxes drawn with asterisks or other characters. 
+Comments should never include special characters such as form-feed and backspace.
+
+ A single-line comment should be preceded by a blank line. Here's an example of a single-line comment in Java code
+ 
+if (condition) {
+
+    /* Handle the condition. */
+    ...
+}
+
+Very short comments can appear on the same line as the code they describe, but should be shifted far enough to separate them from the statements. If more than one short comment appears in a chunk of code, they should all be indented to the same tab setting.
+
+Here's an example of a trailing comment in Java code:
+
+if (a == 2) {
+    return TRUE;            /* special case */
+} else {
+    return isPrime(a);      /* works only for odd a */
+}
+
+Each doc comment is set inside the comment delimiters /**...*/, with one comment per class, interface, or member. This comment should appear just before the declaration:
+
+/**
+ * The Example class provides ...
+ */
+public class Example { ...
+
+Doc comments should not be positioned inside a method or constructor definition block, because Java associates documentation comments with the first declaration after the comment.
+
+One declaration per line is recommended since it encourages commenting. In other words,
+
+int level; // indentation level
+int size;  // size of table
+is preferred over
+int level, size;
+
+Do not put different types on the same line. Example:        
+    int foo,  fooarray[]; //WRONG!
+	
+Note: The examples above use one space between the type and the identifier. Another acceptable alternative is to use tabs, e.g.:
+
+int     level;          // indentation level
+int     size;            // size of table
+Object  currentEntry;    // currently selected table entry
+
+initialize local variables where they're declared.
+
+Put declarations only at the beginning of blocks. (A block is any code surrounded by curly braces "{" and "}".) Don't wait to declare variables until their first use; it can confuse the unwary programmer and hamper code portability within the scope.
+
+void myMethod() {
+    int int1 = 0;         // beginning of method block
+
+    if (condition) {
+        int int2 = 0;     // beginning of "if" block
+        ...
+    }
+}
+
+The one exception to the rule is indexes of for loops, which in Java can be declared in the for statement:
+
+for (int i = 0; i < maxLoops; i++) { ... }
+
+Avoid local declarations that hide declarations at higher levels. For example, do not declare the same variable name in an inner block:
+int count;
+...
+myMethod() {
+    if (condition) {
+        int count = 0;     // AVOID!
+        ...
+    }
+    ...
+}
+No space between a method name and the parenthesis "(" starting its parameter list
+Open brace "{" appears at the end of the same line as the declaration statement
+Closing brace "}" starts a line by itself indented to match its corresponding opening statement, except when it is a null statement the "}" should appear immediately after the "{"
+Methods are separated by a blank line
+
+Braces are used around all statements, even single statements, when they are part of a control structure, such as an if-else or for statement. This makes it easier to add statements without accidentally introducing bugs due to forgetting to add braces.
+
+if (condition) {
+    statements;
+}
+
+if (condition) {
+    statements;
+} else {
+    statements;
+}
+
+if (condition) {
+    statements;
+} else if (condition) {
+    statements;
+} else {
+    statements;
+}
+
+When using the comma operator in the initialization or update clause of a for statement, avoid the complexity of using more than three variables. If needed, use separate statements before the for loop (for the initialization clause) or at the end of the loop (for the update clause).
+
+A do-while statement should have the following form:
+
+do {
+    statements;
+} while (condition);
+
+A switch statement should have the following form:
+
+switch (condition) {
+case ABC:
+    statements;
+    /* falls through */
+case DEF:
+    statements;
+    break;
+case XYZ:
+    statements;
+    break;
+default:
+    statements;
+    break;
+}
+
+Every time a case falls through (doesn't include a break statement), add a comment where the break statement would normally be. This is shown in the preceding code example with the /* falls through */ comment.
+
+Every switch statement should include a default case. The break in the default case is redundant, but it prevents a fall-through error if later another case is added.
+
+A try-catch statement should have the following format:
+
+try {
+    statements;
+} catch (ExceptionClass e) {
+     statements;
+}
+
+A try-catch statement may also be followed by finally, which executes regardless of whether or not the try block has completed successfully.
+
+try {
+    statements;
+} catch (ExceptionClass e) {
+    statements;
+} finally {
+    statements;
+}
+
+Two blank lines should always be used in the following circumstances:
+Between sections of a source file
+Between class and interface definitions
+
+One blank line should always be used in the following circumstances:
+Between methods
+Between the local variables in a method and its first statement
+Before a block (see section 5.1.1) or single-line (see section 5.1.2) comment
+Between logical sections inside a method to improve readability
+
+A keyword followed by a parenthesis should be separated by a space. Example:
+       while (true) {
+           ...
+       }
+
+Note that a blank space should not be used between a method name and its opening parenthesis. This helps to distinguish keywords from method calls.
+
+A blank space should appear after commas in argument lists.
+All binary operators except . should be separated from their operands by spaces. Blank spaces should never separate unary operators such as unary minus, increment ("++"), and decrement ("--") from their operands. Example:
+    a += c + d;
+    a = (a + b) / (c * d);
+    
+    while (d++ = s++) {
+        n++;
+    }
+    printSize("size is " + foo + "\n");
+	
+
+
+The expressions in a for statement should be separated by blank spaces. Example:
+    for (expr1; expr2; expr3)
+
+Casts should be followed by a blank space. Examples:
+    myMethod((byte) aNum, (Object) x);
+    myMethod((int) (cp + 5), ((int) (i + 3)) 
+                                  + 1);
+								  
+Variable names should not start with underscore _ or dollar sign $ characters, even though both are allowed.
+
+One-character variable names should be avoided except for temporary "throwaway" variables. Common names for temporary variables are i, j, k, m, and n for integers; c, d, and e for characters.
+
+The names of variables declared class constants and of ANSI constants should be all uppercase with words separated by underscores ("_"). (ANSI constants should be avoided, for ease of debugging.)
+static final int MIN_WIDTH = 4;
+static final int MAX_WIDTH = 999;
+static final int GET_THE_CPU = 1;
+
+Don't make any instance or class variable public without good reason.
+
+One example of appropriate public instance variables is the case where the class is essentially a data structure, with no behavior. In other words, if you would have used a struct instead of a class (if Java supported struct), then it's appropriate to make the class's instance variables public.
+
+Avoid using an object to access a class (static) variable or method. Use a class name instead. For example:
+
+classMethod();             //OK
+AClass.classMethod();      //OK
+anObject.classMethod();    //AVOID!
+
+Numerical constants (literals) should not be coded directly, except for -1, 0, and 1, which can appear in a for loop as counter values.
+
+Avoid assigning several variables to the same value in a single statement. It is hard to read. Example:
+fooBar.fChar = barFoo.lchar = 'c'; // AVOID!
+
+It is generally a good idea to use parentheses liberally in expressions involving mixed operators to avoid operator precedence problems. Even if the operator precedence seems clear to you, it might not be to others-you shouldn't assume that other programmers know precedence as well as you do.
+
+if (a == b && c == d)     // AVOID!
+if ((a == b) && (c == d)) // RIGHT
+
+Similarly,
+
+if (condition) {
+    return x;
+}
+return y;
+should be written as
+
+return (condition ? x : y);
+
+If an expression containing a binary operator appears before the ? in the ternary ?: operator, it should be parenthesized. Example:
+(x >= 0) ? x : -x;
+
+Use XXX in a comment to flag something that is bogus but works. Use FIXME to flag something that is bogus and broken.
+
+A doc comment is written in HTML and must precede a class, field, constructor or method declaration. It is made up of two parts -- a description followed by block tags. In this example, the block tags are @param, @return, and @see.
+
+/**
+ * Returns an Image object that can then be painted on the screen. 
+ * The url argument must specify an absolute {@link URL}. The name
+ * argument is a specifier that is relative to the url argument. 
+ * <p>
+ * This method always returns immediately, whether or not the 
+ * image exists. When this applet attempts to draw the image on
+ * the screen, the data will be loaded. The graphics primitives 
+ * that draw the image will incrementally paint on the screen. 
+ *
+ * @param  url  an absolute URL giving the base location of the image
+ * @param  name the location of the image, relative to the url argument
+ * @return      the image at the specified URL
+ * @see         Image
+ */
+ public Image getImage(URL url, String name) {
+        try {
+            return getImage(new URL(url, name));
+        } catch (MalformedURLException e) {
+            return null;
+        }
+ }
+ 
+ Insert a blank comment line between the description and the list of tags, as shown.
+The first line that begins with an "@" character ends the description. There is only one description block per doc comment; you cannot continue the description following block tags.
+
+The first sentence of each doc comment should be a summary sentence, containing a concise but complete description of the API item.
+This sentence ends at the first period that is followed by a blank, tab, or line terminator, or at the first tag (as defined below). For example, this first sentence ends at "Prof.":
+
+   /**
+    * This is a simulation of Prof. Knuth's MIX computer.
+    */
+However, you can work around this by typing an HTML meta-character such as "&" or "<" immediately after the period, such as:
+
+   /**
+    * This is a simulation of Prof.&nbsp;Knuth's MIX computer.
+    */
+Ideally, make description complete enough for conforming implementors. Realistically, include enough description so that someone reading the source code can write a substantial suite of conformance tests. Basically, the spec should be complete, including boundary conditions, parameter ranges and corner cases.
+	
+If you must document implementation-specific behavior, please document it in a separate paragraph with a lead-in phrase that makes it clear it is implementation-specific. If the implementation varies according to platform, then specify "On <platform>" at the start of the paragraph. In other cases that might vary with implementations on a platform you might use the lead-in phrase "Implementation-Specific:". Here is an example of an implementation-dependent part of the specification for java.lang.Runtime:
+
+On Windows systems, the path search behavior of the loadLibrary method is identical to that of the Windows API's LoadLibrary procedure.
+
+The use of "On Windows" at the beginning of the sentence makes it clear up front that this is an implementation note.
+
+Use <code> style for keywords and names. 
+Keywords and names are offset by <code>...</code> when mentioned in a description. This includes:
+Java keywords
+package names
+class names
+method names
+interface names
+field names
+argument names
+code examples
+
+adding a link to an API name if:
+
+The user might actually want to click on it for more information (in your judgment), and
+Only for the first occurrence of each API name in the doc comment (don't bother repeating a link)
+
+When referring to a method or constructor that has multiple forms, and you mean to refer to a specific form, use parentheses and argument types. For example, ArrayList has two add methods: add(Object) and add(int, Object):
+
+The add(int, Object) method adds an item at a specified position in this arraylist.
+
+However, if referring to both forms of the method, omit the parentheses altogether. It is misleading to include empty parentheses, because that would imply a particular form of the method. The intent here is to distinguish the general method from any of its particular forms. Include the word "method" to distinguish it as a method and not a field.
+The add method enables you to insert items. (preferred)
+The add() method enables you to insert items. (avoid when you mean "all forms" of the add method)
+
+A method implements an operation, so it usually starts with a verb phrase:
+Gets the label of this button. (preferred)
+This method gets the label of this button. (avoid)
+
+Class/interface/field descriptions can omit the subject and simply state the object.
+These API often describe things rather than actions or behaviors:
+A button label. (preferred)
+This field is a button label. (avoid)
+
+Use "this" instead of "the" when referring to an object created from the current class.
+For example, the description of the getToolkit method should read as follows:
+Gets the toolkit for this component. (preferred)
+Gets the toolkit for the component. (avoid)
+
+Avoid - The description below says nothing beyond what you know from reading the method name. The words "set", "tool", "tip", and "text" are simply repeated in a sentence.
+
+/**
+ * Sets the tool tip text.
+ *
+ * @param text  the text of the tool tip
+ */
+public void setToolTipText(String text) {
+Preferred - This description more completely defines what a tool tip is, in the larger context of registering and being displayed in response to the cursor.
+
+/**
+ * Registers the text to display in a tool tip.   The text 
+ * displays when the cursor lingers over the component.
+ *
+ * @param text  the string to display.  If the text is null, 
+ *              the tool tip is turned off for this component.
+ */
+public void setToolTipText(String text) {
+
+
+Avoid Latin
+use "also known as" instead of "aka", use "that is" or "to be specific" instead of "i.e.", use "for example" instead of "e.g.", and use "in other words" or "namely" instead of "viz."
+
+Include tags in the following order:
+
+@author (classes and interfaces only, required)
+@version (classes and interfaces only, required. See footnote 1)
+@param (methods and constructors only)
+@return (methods only)
+@exception (@throws is a synonym added in Javadoc 1.2)
+@see
+@since
+@serial (or @serialField or @serialData)
+@deprecated (see How and When To Deprecate APIs)
+
+If desired, groups of tags, such as multiple @see tags, can be separated from the other tags by a blank line with a single asterisk.
+
+Multiple @author tags should be listed in chronological order, with the creator of the class listed at the top.
+
+Multiple @param tags should be listed in argument-declaration order. This makes it easier to visually match the list to the declaration.
+
+Multiple @throws tags (also known as @exception) should be listed alphabetically by the exception names.  
+
+@see #field
+@see #Constructor(Type, Type...)
+@see #Constructor(Type id, Type id...)
+@see #method(Type, Type,...)
+@see #method(Type id, Type, id...)
+@see Class
+@see Class#field
+@see Class#Constructor(Type, Type...)
+@see Class#Constructor(Type id, Type id)
+@see Class#method(Type, Type,...)
+@see Class#method(Type id, Type id,...)
+@see package.Class
+@see package.Class#field
+@see package.Class#Constructor(Type, Type...)
+@see package.Class#Constructor(Type id, Type id)
+@see package.Class#method(Type, Type,...)
+@see package.Class#method(Type id, Type, id)
+@see package
+
+An @param tag is "required" (by convention) for every parameter, even when the description is obvious. The @return tag is required for every method that returns something other than void, even if it is redundant with the method description. (Whenever possible, find something non-redundant (ideally, more specific) to use for the tag comment.)
+
+\end{lstlisting}
